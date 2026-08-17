@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>保健室</title><style>
+:root{--board:#1b3d2f; --board2:#163327; --chalk:#f2efe4; --chalk-dim:#c9c4b2;
+  --chalk-yellow:#e8d47a; --paper:#f7f3e6; --ink:#2a2620; --accent:#8d2626;}
+*{box-sizing:border-box;}
+body{margin:0; background:linear-gradient(180deg,var(--board),var(--board2));
+  color:var(--chalk); font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+  min-height:100vh; padding-bottom:80px;}
+.wrap{max-width:560px; margin:0 auto; padding:20px 16px;}
+h1{font-size:24px; letter-spacing:.3em; text-align:center; margin:26px 0 4px;}
+.sub{color:var(--chalk-dim); font-size:13px; text-align:center; margin-bottom:18px;}
+.sheet{position:relative; background:var(--paper); color:var(--ink); border-radius:6px;
+  padding:22px 20px 26px; box-shadow:0 6px 18px rgba(0,0,0,.35);}
+.sheet p{line-height:1.9; font-size:15.5px; margin:12px 0;}
+.quiz{margin:16px 4px; border-top:1px solid #cfc8b4;}
+.qrow{display:flex; align-items:baseline; gap:12px; padding:9px 4px;
+  border-bottom:1px solid #cfc8b4; font-size:16px;}
+.qw{flex:1;} .qa{color:#3a3428; flex:none;}
+.ansrow{display:flex; gap:8px; margin-top:18px;}
+.ansrow input{flex:1; font-size:17px; padding:12px; border:2px solid var(--ink);
+  border-radius:4px; background:#fffdf6; color:var(--ink); min-width:0;}
+.ansrow button{flex:none; font-size:16px; padding:12px 18px; border:2px solid var(--ink);
+  background:var(--ink); color:var(--paper); border-radius:4px;}
+.verdict{min-height:22px; margin-top:10px; font-size:14px; color:var(--accent);}
+.reveal{display:none; margin-top:16px; padding:14px; border:1px dashed var(--accent);
+  border-radius:6px; font-size:15px; line-height:1.9;}
+.back{display:block; text-align:center; margin-top:26px; color:var(--chalk-dim); font-size:13px;}
+a{color:inherit;}
+</style></head>
+<body><div class="wrap">
+<h1>保健室</h1><div class="sub">―― 静かに。</div>
+<div class="sheet">
+<p>ベッドにひとり。枕元の検温記録:</p>
+<div class="quiz">
+  <div class="qrow"><span class="qw">一回目</span><span class="qa">36.5</span></div>
+  <div class="qrow"><span class="qw">二回目</span><span class="qa">37.2</span></div>
+  <div class="qrow"><span class="qw">三回目</span><span class="qa">38.1</span></div>
+  <div class="qrow"><span class="qw">四回目</span><span class="qa">――</span></div>
+</div>
+<p>熱は、いつも同じようには上がらない。<br>四回目の検温値を答えよ。</p>
+<div class="ansrow">
+  <input id="a" type="text" autocomplete="off" placeholder="解答"
+    onkeydown="if(event.key==='Enter')go()">
+  <button onclick="go()">提出</button>
+</div>
+<div class="verdict" id="v"></div>
+<div class="reveal" id="r">
+  保健係のメモ ――<br>
+  「屋上のあいことばは、<em style="color:var(--accent)">一番星の名</em>。」<br>
+  <a href="okujou.html">…階段をのぼる</a>
+</div>
+</div>
+<a class="back" href="index.html">← 教室へ戻る</a>
+</div>
+<script>
+
+/* ---------- SHA-256 (同期・依存なし) ---------- */
+function sha256(ascii){
+  function rr(v,a){return (v>>>a)|(v<<(32-a));}
+  var mp=Math.pow, mc=mp(2,32), i, j, result='';
+  var words=[], asciiBitLength=ascii.length*8;
+  if(!sha256.k){
+    var kk=[], HH=[], pc=0, isComposite={};
+    for(var candidate=2; pc<64; candidate++){
+      if(!isComposite[candidate]){
+        for(i=0;i<313;i+=candidate){isComposite[i]=candidate;}
+        HH[pc]=(mp(candidate,.5)*mc)|0;
+        kk[pc++]=(mp(candidate,1/3)*mc)|0;
+      }
+    }
+    sha256.k=kk; sha256.H=HH;
+  }
+  var k=sha256.k, hash=sha256.H.slice(0,8);
+  ascii+='\x80';
+  while(ascii.length%64-56) ascii+='\x00';
+  for(i=0;i<ascii.length;i++){
+    j=ascii.charCodeAt(i);
+    if(j>>8) return;
+    words[i>>2]|=j<<((3-i)%4)*8;
+  }
+  words[words.length]=(asciiBitLength/mc)|0;
+  words[words.length]=asciiBitLength;
+  for(j=0;j<words.length;){
+    var w=words.slice(j,j+=16);
+    var oldHash=hash.slice(0,8);
+    for(i=16;i<64;i++){
+      var w15=w[i-15], w2=w[i-2];
+      var s0=rr(w15,7)^rr(w15,18)^(w15>>>3);
+      var s1=rr(w2,17)^rr(w2,19)^(w2>>>10);
+      w[i]=(w[i-16]+s0+w[i-7]+s1)|0;
+    }
+    var a=hash[0],b=hash[1],c=hash[2],d=hash[3],e=hash[4],f=hash[5],g=hash[6],h=hash[7];
+    for(i=0;i<64;i++){
+      var S1=rr(e,6)^rr(e,11)^rr(e,25);
+      var ch=(e&f)^((~e)&g);
+      var t1=(h+S1+ch+k[i]+w[i])|0;
+      var S0=rr(a,2)^rr(a,13)^rr(a,22);
+      var maj=(a&b)^(a&c)^(b&c);
+      var t2=(S0+maj)|0;
+      h=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+    }
+    hash[0]=(hash[0]+a)|0; hash[1]=(hash[1]+b)|0; hash[2]=(hash[2]+c)|0; hash[3]=(hash[3]+d)|0;
+    hash[4]=(hash[4]+e)|0; hash[5]=(hash[5]+f)|0; hash[6]=(hash[6]+g)|0; hash[7]=(hash[7]+h)|0;
+  }
+  for(i=0;i<8;i++){
+    for(j=3;j+1;j--){
+      var b8=(hash[i]>>(j*8))&255;
+      result+=((b8>>4).toString(16))+((b8&15).toString(16));
+    }
+  }
+  return result;
+}
+function utf8(s){
+  var bytes=new TextEncoder().encode(s), out='';
+  for(var i=0;i<bytes.length;i++) out+=String.fromCharCode(bytes[i]);
+  return out;
+}
+function digest(s){ return sha256(utf8(s)); }
+/* ---------- 正規化: NFKC → 空白除去 → 小文字 → ひらがな→カタカナ ---------- */
+function norm(s){
+  s=(s||'').normalize('NFKC').toLowerCase().replace(/[\s\u3000]/g,'');
+  s=s.replace(/[\u3041-\u3096]/g,function(c){return String.fromCharCode(c.charCodeAt(0)+0x60);});
+  return s;
+}
+
+var OK=["04c0e2971caba7ad616cbb074265271f097fcba969dfd0d265a96184a505cdc2",
+        "6b94f0e88cd3cd9b7ec9e034dd24232daff8270c6d200116871c97224612d14d"];
+function go(){
+  var x=digest(norm(document.getElementById('a').value));
+  if(OK.indexOf(x)>=0){
+    document.getElementById('v').textContent='';
+    document.getElementById('r').style.display='block';
+  }else{
+    document.getElementById('v').textContent='不正解。落ち着いて、変化を見よ。';
+  }
+}
+</script></body></html>

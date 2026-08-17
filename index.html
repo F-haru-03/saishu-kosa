@@ -2,254 +2,407 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<title>最終考査 ― 三年壱組 夜間補講</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>最終考査</title>
 <style>
 :root{
-  --board:#22332c;      /* 黒板の緑 */
-  --board-deep:#1a2823;
-  --chalk:#f2efe6;      /* チョーク白 */
-  --chalk-dim:#c8c9bd;
-  --chalk-yellow:#e8d27a;
-  --paper:#f6f1e3;      /* 答案用紙 */
-  --paper-line:#d8cfb8;
-  --ink:#2b2620;
-  --seal:#b3382c;       /* 採点印の朱 */
+  --board:#1b3d2f; --board2:#163327; --chalk:#f2efe4; --chalk-dim:#c9c4b2;
+  --chalk-yellow:#e8d47a; --paper:#f7f3e6; --ink:#2a2620; --accent:#8d2626;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{background:var(--board-deep)}
-body{
-  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
-  background:
-    radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.04), transparent 45%),
-    radial-gradient(ellipse at 85% 70%, rgba(255,255,255,.03), transparent 40%),
-    var(--board);
-  color:var(--chalk);
-  min-height:100vh;
-  padding:0 0 96px;
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+body{margin:0; background:linear-gradient(180deg,var(--board),var(--board2));
+  color:var(--chalk); font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+  min-height:100vh; padding-bottom:80px;}
+.wrap{max-width:560px; margin:0 auto; padding:20px 16px;}
+header{ text-align:center; padding:26px 0 8px;}
+h1{font-size:30px; letter-spacing:.4em; margin:0; text-indent:.4em;}
+.sub{color:var(--chalk-dim); font-size:13px; margin-top:8px;}
+.chalkline{border:none; border-top:2px solid rgba(242,239,228,.5); margin:18px 0;}
+
+/* ---- 時間割ハブ ---- */
+.tt{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
+.slot{display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.06);
+  border:1px solid rgba(242,239,228,.35); border-radius:8px; padding:14px 16px;
+  cursor:pointer; user-select:none;}
+.slot:active{background:rgba(255,255,255,.12);}
+.slot .period{width:74px; text-align:center; font-size:15px; color:var(--chalk-yellow);
+  border-right:1px solid rgba(242,239,228,.3); padding-right:10px; flex:none;}
+.slot .name{flex:1; font-size:17px; letter-spacing:.1em;}
+.slot .state{flex:none; font-size:13px; color:var(--chalk-dim);}
+.slot.done .state{color:var(--chalk-yellow);}
+.slot.locked{opacity:.55; cursor:default;}
+.slot.na{opacity:.55;}
+
+/* ---- 問題ビュー(答案用紙) ---- */
+.view{display:none;}
+.view.on{display:block;}
+.backbar{position:sticky; top:0; z-index:5; background:linear-gradient(180deg,var(--board) 70%,transparent);
+  padding:10px 0 14px;}
+.backbtn{display:inline-block; color:var(--chalk); border:1px solid rgba(242,239,228,.5);
+  border-radius:6px; padding:8px 18px; font-size:14px; background:rgba(0,0,0,.15); cursor:pointer;}
+.sheet{position:relative; background:var(--paper); color:var(--ink); border-radius:6px;
+  padding:22px 20px 26px; box-shadow:0 6px 18px rgba(0,0,0,.35);}
+.sheet h2{margin:0 0 4px; font-size:15px; color:#6b6656; font-weight:normal; letter-spacing:.2em;}
+.sheet h3{margin:0 0 16px; font-size:22px; letter-spacing:.15em;}
+.sheet p{line-height:1.9; font-size:15.5px; margin:12px 0;}
+.sheet .mono{font-family:ui-monospace,Menlo,monospace;}
+.ansrow{display:flex; gap:8px; margin-top:18px;}
+.ansrow input{flex:1; font-size:17px; padding:12px 12px; border:2px solid var(--ink);
+  border-radius:4px; background:#fffdf6; color:var(--ink); min-width:0;}
+.ansrow button{flex:none; font-size:16px; padding:12px 18px; border:2px solid var(--ink);
+  background:var(--ink); color:var(--paper); border-radius:4px; cursor:pointer;}
+.verdict{min-height:22px; margin-top:10px; font-size:14px; color:var(--accent);}
+.hintline{display:none; margin-top:8px; font-size:13px; color:#6b6656;}
+.wrong{animation:sh .35s;}
+@keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.stamp{position:absolute; top:14px; right:16px; color:var(--accent);
+  border:4px double var(--accent); border-radius:8px; padding:8px 12px;
+  font-size:26px; font-weight:bold; transform:rotate(-12deg); letter-spacing:.1em;
+  display:none; background:rgba(255,255,255,.6);}
+.sheet.passed .stamp{display:block; animation:st .5s cubic-bezier(.2,2,.4,1);}
+@keyframes st{0%{transform:rotate(-12deg) scale(2.4); opacity:0}100%{transform:rotate(-12deg) scale(1); opacity:1}}
+.sheet.passed input,.sheet.passed button{opacity:.45; pointer-events:none;}
+.notyet{color:#6b6656; font-size:15px; line-height:2;}
+.poem{margin:20px 8px 8px; line-height:2.6; font-size:17px;}
+.poem .ptitle{font-size:15px; color:#6b6656; margin-bottom:10px;}
+.poem ruby rt{font-size:10px; color:#6b6656; letter-spacing:.05em;}
+.ghost{color:#f7f3e6; user-select:text; -webkit-user-select:text;
+  margin:34px 8px 30px; font-size:15px; line-height:2;}
+.ghost::selection{background:#2a2620; color:#f7f3e6;}
+.lie::before{content:attr(data-t);}
+.lie{user-select:none; -webkit-user-select:none;}
+.taiso{display:grid; grid-auto-flow:column; grid-template-rows:repeat(2,auto);
+  gap:2px 10px; justify-content:center; margin:18px 0;
+  font-size:19px; letter-spacing:.05em;}
+@media (orientation: landscape){
+  .taiso{grid-auto-flow:row; grid-template-rows:none; grid-template-columns:repeat(7,auto);}
 }
-.frame{max-width:560px;margin:0 auto;padding:0 18px}
-header{
-  text-align:center;
-  padding:56px 0 8px;
+.kokuban{background:#17362a; border:6px solid #6b5335; border-radius:4px;
+  margin:16px 0; padding:18px 14px; min-height:150px;}
+.desks{display:grid; grid-template-columns:repeat(4,1fr); gap:10px 14px; opacity:0;}
+.desks .d{height:22px; border:1.5px solid #b6ffdc; border-radius:2px; position:relative;}
+.desks .g0,.desks .g1,.desks .g2,.desks .g3{transform:rotate(14deg);
+  box-shadow:0 0 8px rgba(182,255,220,.8);}
+.desks .g0::after{content:"一";} .desks .g1::after{content:"二";}
+.desks .g2::after{content:"三";} .desks .g3::after{content:"四";}
+.desks .d::after{position:absolute; right:-4px; top:-12px; font-size:11px; color:#b6ffdc;}
+@media (prefers-color-scheme: dark){
+  .desks{opacity:1; transition:opacity 2.5s;}
 }
-.kanban{
-  display:inline-block;
-  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-  font-size:13px;letter-spacing:.5em;text-indent:.5em;
-  color:var(--chalk-dim);
-  border:1px solid rgba(242,239,230,.35);
-  padding:6px 14px;border-radius:2px;
-}
-h1{
-  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-  font-size:44px;font-weight:700;
-  letter-spacing:.18em;text-indent:.18em;
-  margin:18px 0 6px;
-  text-shadow:0 0 14px rgba(242,239,230,.25);
-}
-.sub{color:var(--chalk-dim);font-size:13px;letter-spacing:.2em}
-.chalkline{
-  border:none;height:2px;margin:26px auto 0;max-width:200px;
-  background:linear-gradient(90deg,transparent,rgba(242,239,230,.7),transparent);
-}
-section.period{
-  margin-top:44px;
-  animation:appear .6s ease both;
-}
-@keyframes appear{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.p-label{
-  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-  color:var(--chalk-yellow);
-  font-size:15px;letter-spacing:.35em;
-  margin-bottom:10px;
-}
-.p-label::before{content:"― ";color:var(--chalk-dim)}
-.p-title{
-  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-  font-size:24px;letter-spacing:.1em;margin-bottom:14px;
-}
-.p-body{font-size:15px;line-height:2;color:var(--chalk)}
-.p-body em{font-style:normal;color:var(--chalk-yellow)}
-.artwork{
-  display:block;width:100%;border-radius:4px;margin:18px 0 4px;
-  border:1px solid rgba(242,239,230,.18);
-}
-.note{font-size:12px;color:var(--chalk-dim);margin-top:6px}
-.poem{
-  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-  font-size:17px;line-height:2.6;letter-spacing:.08em;
-  margin:20px 0 4px;padding-left:14px;
-  border-left:2px solid rgba(242,239,230,.25);
-}
-.poem .ghost{
-  color:var(--board); /* 背景と同色: 選択すると浮かぶ */
-  font-size:13px;line-height:2.1;display:block;
-}
-::selection{background:var(--chalk-yellow);color:var(--ink)}
-/* 答案用紙 */
-.touan{
-  background:
-    repeating-linear-gradient(180deg,transparent,transparent 34px,var(--paper-line) 34px,var(--paper-line) 35px),
-    var(--paper);
-  color:var(--ink);
-  border-radius:3px;
-  padding:16px 16px 18px;
-  margin-top:22px;
-  box-shadow:0 6px 18px rgba(0,0,0,.35);
-  position:relative;
-}
-.touan label{
-  display:block;font-size:11px;letter-spacing:.3em;color:#8a7f6a;margin-bottom:8px;
-}
-.touan .row{display:flex;gap:10px}
-.touan input{
-  flex:1;min-width:0;
-  font-size:17px;padding:10px 12px;
-  border:1px solid #b7ab8f;border-radius:3px;
-  background:#fffdf6;color:var(--ink);
-  font-family:inherit;
-}
-.touan input:focus{outline:2px solid var(--seal);outline-offset:1px;border-color:var(--seal)}
-.touan button{
-  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-  font-size:15px;letter-spacing:.15em;
-  padding:10px 18px;border:none;border-radius:3px;
-  background:var(--ink);color:var(--paper);
-}
-.touan button:active{transform:translateY(1px)}
-.verdict{min-height:22px;margin-top:10px;font-size:13px;color:var(--seal)}
-.touan.wrong{animation:shake .35s}
-@keyframes shake{
-  20%{transform:translateX(-6px)}40%{transform:translateX(6px)}
-  60%{transform:translateX(-4px)}80%{transform:translateX(4px)}
-}
-/* 採点印 */
-.seal{
-  position:absolute;top:-18px;right:10px;
-  width:84px;height:84px;border-radius:50%;
-  border:3px solid var(--seal);color:var(--seal);
-  display:flex;align-items:center;justify-content:center;
-  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-  font-size:26px;font-weight:700;letter-spacing:.1em;
-  transform:rotate(-12deg) scale(0);
-  background:rgba(246,241,227,.92);
-  pointer-events:none;
-}
-.touan.passed .seal{animation:stamp .45s cubic-bezier(.2,1.6,.4,1) forwards}
-@keyframes stamp{
-  0%{transform:rotate(-30deg) scale(2.4);opacity:0}
-  60%{opacity:1}
-  100%{transform:rotate(-12deg) scale(1);opacity:1}
-}
-.touan.passed input,.touan.passed button{opacity:.45;pointer-events:none}
-.hintline{display:none;font-size:12px;color:#8a7f6a;margin-top:8px}
-/* 修了 */
-.shuuryou{
-  text-align:center;margin-top:56px;
-  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-}
-.shuuryou .big{font-size:34px;letter-spacing:.3em;text-indent:.3em;color:var(--chalk-yellow)}
-.shuuryou p{margin-top:14px;font-size:14px;line-height:2;color:var(--chalk)}
-.locked{
-  margin-top:40px;text-align:center;color:var(--chalk-dim);
-  border:1px dashed rgba(242,239,230,.3);border-radius:4px;
-  padding:22px 16px;font-size:13px;letter-spacing:.15em;
-}
-footer{text-align:center;margin-top:70px;color:var(--chalk-dim);font-size:11px;letter-spacing:.2em}
-.hidden{display:none}
-@media (prefers-reduced-motion: reduce){
-  *{animation:none !important;transition:none !important}
-  .touan.passed .seal{transform:rotate(-12deg) scale(1);opacity:1}
-}
+.pimg{width:100%; display:block; margin:14px 0 4px; border-radius:4px;}
+.quiz{margin:16px 4px; border-top:1px solid #cfc8b4;}
+.qrow{display:flex; align-items:baseline; gap:12px; padding:9px 4px;
+  border-bottom:1px solid #cfc8b4; font-size:16px;}
+.qno{color:#6b6656; flex:none; width:22px;}
+.qw{letter-spacing:.08em; flex:1;}
+.qa{color:#3a3428; flex:none;}
+.qmark{color:var(--accent); flex:none; width:22px; font-size:18px;}
+.score{margin:14px 8px; line-height:2.2; font-size:18px; letter-spacing:.12em;}
+.drow{display:flex; align-items:center; gap:6px; margin:9px 0;}
+.dlabel{flex:none; width:64px; font-size:13.5px; color:#6b6656;}
+.cell{width:34px; height:34px; border:1.5px solid var(--ink); border-radius:3px; flex:none;}
+.circ{border:2.5px double var(--accent); border-radius:50%;}
+.locked-note{border:1px dashed rgba(242,239,228,.5); border-radius:8px; padding:16px;
+  color:var(--chalk-dim); font-size:14px; line-height:1.9; margin-top:14px;}
+footer{text-align:center; color:rgba(242,239,228,.4); font-size:11px; margin-top:44px; letter-spacing:.2em;}
 </style>
 </head>
 <body>
-<div class="frame">
+<!-- 屋上は施錠されている。鍵の在り処は、保健のたより。 -->
+<div class="wrap">
 
 <header>
-  <span class="kanban">三年壱組 夜間補講</span>
   <h1>最終考査</h1>
-  <div class="sub">SAISHU KOSA ― 出題者は闇の中</div>
-  <hr class="chalkline">
+  <div class="sub">一日目 ―― 登校</div>
 </header>
+<hr class="chalkline">
 
-<!-- 一限 -->
-<section class="period" id="s1">
-  <div class="p-label">一限</div>
-  <div class="p-title">点呼</div>
-  <p class="p-body">招謎状は受け取ったな。<br>
-  座席表を確かめ、<em>本日の補講内容</em>を答案に記せ。</p>
-  <div class="touan" id="t1">
-    <div class="seal">合格</div>
-    <label>解答欄</label>
-    <div class="row">
-      <input type="text" id="a1" autocomplete="off" placeholder="補講内容を記入">
-      <button onclick="submitAns(1)">提出</button>
+<!-- ================= 時間割(ハブ) ================= -->
+<div class="view on" id="view-hub">
+  <p style="color:var(--chalk-dim); font-size:14px; line-height:1.9;">
+    時間の定めはない。好きな時限から解いてよい。<br>
+    全課程を修了した者のみ、帰りの会に出席できる。
+  </p>
+  <div class="tt" id="tt"></div>
+</div>
+
+<!-- ================= 朝礼: 点呼 ================= -->
+<div class="view" id="view-chorei">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-chorei">
+    <div class="stamp">合格</div>
+    <h2>朝礼</h2><h3>点呼</h3>
+    <p>招謎状を手に取れ。<br>本日の補講内容を答えよ。</p>
+    <div class="ansrow">
+      <input id="a-chorei" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('chorei')">
+      <button onclick="submitAns('chorei')">提出</button>
     </div>
-    <div class="verdict" id="v1"></div>
-    <div class="hintline" id="h1">※ どうしても詰まったら、出題者(この謎を贈った者)に問え。</div>
+    <div class="verdict" id="v-chorei"></div>
+    <div class="hintline" id="h-chorei">※ どうしても詰まったら、出題者に問え。</div>
   </div>
-</section>
+</div>
 
-<!-- 二限 -->
-<section class="period hidden" id="s2">
-  <div class="p-label">二限</div>
-  <div class="p-title">天文</div>
-  <p class="p-body">消灯後の教室から、夜空を写した。<br>
-  <em>何も見えぬ夜こそ、よく視よ。</em></p>
-  <img class="artwork" src="yoru.png" alt="真っ暗な夜空の写真">
-  <p class="note">(画像は保存してよい)</p>
-  <div class="touan" id="t2">
-    <div class="seal">合格</div>
-    <label>解答欄</label>
-    <div class="row">
-      <input type="text" id="a2" autocomplete="off" inputmode="numeric" placeholder="第二の鍵を記入">
-      <button onclick="submitAns(2)">提出</button>
+<!-- ================= 一限: 国語 ================= -->
+<div class="view" id="view-k1">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-k1">
+    <div class="stamp">合格</div>
+    <h2>一限</h2><h3>国語</h3>
+    <p>問 ―― 次の詩を読み、問いに答えよ。</p>
+    <div class="poem">
+      <div class="ptitle">「夜の図書室」</div>
+      <div><ruby>星空<rt>ほりぞら</rt></ruby>を 窓辺に置いて</div>
+      <div><ruby>言葉<rt>のとば</rt></ruby>を ひとつ 拾う</div>
+      <div><ruby>泉<rt>いずま</rt></ruby>の底に 沈めて</div>
+      <div><ruby>桜<rt>さくな</rt></ruby>の 夜に 眠る</div>
     </div>
-    <div class="verdict" id="v2"></div>
-    <div class="hintline" id="h2">※ どうしても詰まったら、出題者に問え。</div>
-  </div>
-</section>
-
-<!-- 三限 -->
-<section class="period hidden" id="s3">
-  <div class="p-label">三限</div>
-  <div class="p-title">国語(?)</div>
-  <p class="p-body">最後の授業は詩の鑑賞である。<br>
-  <em>行間を読め。</em></p>
-  <div class="poem">
-    点は線に、線は面になる<span class="ghost">フェルマーは言った――「私は真に驚くべき証明を見つけたが、それを記すには“ここ”はあまりに狭すぎる」。</span>
-    ひとは問いを重ねて夜を渡る<span class="ghost">彼が指した“ここ”の名。それが三限の鍵である。</span>
-    解けぬ夜もまた、証明の途中である
-  </div>
-  <div class="touan" id="t3">
-    <div class="seal">合格</div>
-    <label>解答欄</label>
-    <div class="row">
-      <input type="text" id="a3" autocomplete="off" placeholder="鍵を記入">
-      <button onclick="submitAns(3)">提出</button>
+    <p class="ghost">ほんこあいだにひそま、もこがたしこつづきをみもる。それはらにか。</p>
+    <div class="ansrow">
+      <input id="a-k1" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('k1')">
+      <button onclick="submitAns('k1')">提出</button>
     </div>
-    <div class="verdict" id="v3"></div>
-    <div class="hintline" id="h3">※ どうしても詰まったら、出題者に問え。</div>
+    <div class="verdict" id="v-k1"></div>
+    <div class="hintline" id="h-k1">※ どうしても詰まったら、出題者に問え。</div>
   </div>
-</section>
+</div>
 
-<!-- 第一幕 修了 -->
-<section class="shuuryou hidden" id="clear1">
-  <hr class="chalkline">
-  <div class="big" style="margin-top:36px">第一幕 修了</div>
-  <p>見事である。だが夜間補講は始まったばかり。<br>
-  これまでの答えは<em style="color:var(--chalk-yellow)">すべて控えておけ</em>。<br>
-  後に問われる。</p>
-  <div class="locked">第二幕 ―― 開講準備中。追って通知する。</div>
-</section>
+<!-- ================= 二限: 理科 ================= -->
+<div class="view" id="view-k2">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-k2">
+    <div class="stamp">合格</div>
+    <h2>二限</h2><h3>理科</h3>
+    <p>窓の外は、まだ夜。<br>今宵、最も明るく輝いた星の名を答えよ。</p>
+    <img class="pimg" src="yoru_v2.png" alt="">
+    <div class="ansrow">
+      <input id="a-k2" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('k2')">
+      <button onclick="submitAns('k2')">提出</button>
+    </div>
+    <div class="verdict" id="v-k2"></div>
+    <div class="hintline" id="h-k2">※ どうしても詰まったら、出題者に問え。</div>
+  </div>
+</div>
+
+<!-- ================= 三限: 英語 ================= -->
+<div class="view" id="view-k3">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-k3">
+    <div class="stamp">合格</div>
+    <h2>三限</h2><h3>英語</h3>
+    <p>返却された小テスト。最後の一問だけ、白紙だった。</p>
+    <div class="quiz">
+      <div class="qrow"><span class="qno">1.</span><span class="qw">FRIEND</span><span class="qa">フレンド</span><span class="qmark">○</span></div>
+      <div class="qrow"><span class="qno">2.</span><span class="qw">LISTEN</span><span class="qa">リスン</span><span class="qmark">○</span></div>
+      <div class="qrow"><span class="qno">3.</span><span class="qw">WRAP</span><span class="qa">ラップ</span><span class="qmark">○</span></div>
+      <div class="qrow"><span class="qno">4.</span><span class="qw">HOUSE</span><span class="qa">ハウス</span><span class="qmark">○</span></div>
+      <div class="qrow"><span class="qno">5.</span><span class="qw">GHOST</span><span class="qa">ゴースト</span><span class="qmark">○</span></div>
+      <div class="qrow"><span class="qno">6.</span><span class="qw">＿ ＿ ＿ ＿ ＿</span><span class="qa">これを訳せ</span><span class="qmark"></span></div>
+    </div>
+    <div class="ansrow">
+      <input id="a-k3" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('k3')">
+      <button onclick="submitAns('k3')">提出</button>
+    </div>
+    <div class="verdict" id="v-k3"></div>
+    <div class="hintline" id="h-k3">※ どうしても詰まったら、出題者に問え。</div>
+  </div>
+</div>
+
+<!-- ================= 四限: 音楽 ================= -->
+<div class="view" id="view-k4">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-k4">
+    <div class="stamp">合格</div>
+    <h2>四限</h2><h3>音楽</h3>
+    <p>歌唱テスト ―― 課題曲『？？？』</p>
+    <p style="font-size:14px; color:#6b6656;">ハ長調で。五十の音を、心して歌うこと。</p>
+    <div class="score">ラ　ラ｜ド　ラ｜ファ　シ</div>
+    <p>課題曲の名を答えよ。</p>
+    <div class="ansrow">
+      <input id="a-k4" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('k4')">
+      <button onclick="submitAns('k4')">提出</button>
+    </div>
+    <div class="verdict" id="v-k4"></div>
+    <div class="hintline" id="h-k4">※ どうしても詰まったら、出題者に問え。</div>
+  </div>
+</div>
+
+<!-- ================= 昼休み: 購買 ================= -->
+<div class="view" id="view-hiru">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-hiru">
+    <div class="stamp">合格</div>
+    <h2>昼休み</h2><h3>購買</h3>
+    <p>購買部 品書(税込)</p>
+    <div class="quiz">
+      <div class="qrow"><span class="qw">ヤサイサンド</span><span class="qa">279円</span></div>
+      <div class="qrow"><span class="qw">カフェオレ</span><span class="qa">198円</span></div>
+      <div class="qrow"><span class="qw">キナコパン</span><span class="qa">224円</span></div>
+      <div class="qrow"><span class="qw">ソーセージパン</span><span class="qa">212円</span></div>
+      <div class="qrow"><span class="qw">ゴマダンゴ</span><span class="qa">197円</span></div>
+      <div class="qrow"><span class="qw">バーガー</span><span class="qa">285円</span></div>
+      <div class="qrow"><span class="qw">オニギリ</span><span class="qa">206円</span></div>
+      <div class="qrow"><span class="qw">リンゴジュース</span><span class="qa">175円</span></div>
+    </div>
+    <p>貼り紙 ――「本日のおすすめ、はじめました。」</p>
+    <p>足元に、落とし物のレシート ―― にじんで読めない行がある。</p>
+    <div class="score" style="font-size:15px;">購買部 御計算書<br>品名　▓▓▓▓<br>点数　4点<br>合計　￥1,000</div>
+    <p>本日のおすすめを答えよ。</p>
+    <div class="ansrow">
+      <input id="a-hiru" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('hiru')">
+      <button onclick="submitAns('hiru')">提出</button>
+    </div>
+    <div class="verdict" id="v-hiru"></div>
+    <div class="hintline" id="h-hiru">※ どうしても詰まったら、出題者に問え。</div>
+  </div>
+</div>
+
+<!-- ================= 五限: 社会 ================= -->
+<div class="view" id="view-k5">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-k5">
+    <div class="stamp">合格</div>
+    <h2>五限</h2><h3>社会</h3>
+    <p>資料 ――『日本のあゆみ』(古い写本の断片)</p>
+    <div class="quiz" id="nenpyo">
+      <div class="qrow"><span class="qw">710年、都が平城京に移る</span></div>
+      <div class="qrow"><span class="qw">奈良時代の末ごろ、歌集『<span class="lie" data-t="古今和歌集"></span>』が編まれる</span></div>
+      <div class="qrow"><span class="qw">794年、都が平安京に移る</span></div>
+      <div class="qrow"><span class="qw">1281年、元軍がふたたび襲来する(<span class="lie" data-t="文永"></span>の役)</span></div>
+      <div class="qrow"><span class="qw">1600年、関ヶ原の戦いが起こる</span></div>
+      <div class="qrow"><span class="qw">1867年、大政奉還が行われる</span></div>
+      <div class="qrow"><span class="qw">1945年、太平洋戦争が終わる</span></div>
+      <div class="qrow"><span class="qw">1964年、アジア初のオリンピックが<span class="lie" data-t="大阪"></span>で開かれる</span></div>
+      <div class="qrow"><span class="qw ghost" style="margin:0;">奥書 ―― 写しに欠けし三つは偽りなり。偽りを正し、頭の一字を年の順に継げ。</span></div>
+    </div>
+    <p>古き資料は、写しを取ってあらためよ。</p>
+    <div class="ansrow">
+      <input id="a-k5" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('k5')">
+      <button onclick="submitAns('k5')">提出</button>
+    </div>
+    <div class="verdict" id="v-k5"></div>
+    <div class="hintline" id="h-k5">※ どうしても詰まったら、出題者に問え。</div>
+  </div>
+</div>
+
+<!-- ================= 六限: 体育 ================= -->
+<div class="view" id="view-k6">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-k6">
+    <div class="stamp">合格</div>
+    <h2>六限</h2><h3>体育</h3>
+    <p>準備運動 ――</p>
+    <p style="font-size:14.5px;">一、しんこきゅう<br>二、くびをまわす<br>三、からだを よこに たおす<br>四、もとにもどす</p>
+    <div class="taiso"><span>ゴ</span><span>ー</span><span>ル</span><span>テ</span><span>ー</span><span>プ</span><span>ヲ</span><span>キ</span><span>ル</span><span>モ</span><span>ノ</span><span>ノ</span><span>ナ</span><span>ハ</span></div>
+    <p>百メートル走 ―― 本日の記録(順不同)</p>
+    <div class="quiz">
+      <div class="qrow"><span class="qw">アオヤマ</span><span class="qa">12.50秒</span></div>
+      <div class="qrow"><span class="qw">ハヤセ</span><span class="qa">0.206分</span></div>
+      <div class="qrow"><span class="qw">ミナト</span><span class="qa">12秒45</span></div>
+      <div class="qrow"><span class="qw">カワゴエ</span><span class="qa">1/300時間</span></div>
+      <div class="qrow"><span class="qw">ツジ</span><span class="qa">12.39秒</span></div>
+    </div>
+    <p style="font-size:13.5px; color:#6b6656;">※負傷者一名、<a href="hokenshitsu.html" style="color:#6b6656; text-decoration:none;">保健室</a>へ。</p>
+    <div class="ansrow">
+      <input id="a-k6" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('k6')">
+      <button onclick="submitAns('k6')">提出</button>
+    </div>
+    <div class="verdict" id="v-k6"></div>
+    <div class="hintline" id="h-k6">※ どうしても詰まったら、出題者に問え。</div>
+  </div>
+</div>
+
+<!-- ================= 放課後: 掃除 ================= -->
+<div class="view" id="view-souji">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-souji">
+    <div class="stamp">合格</div>
+    <h2>放課後</h2><h3>掃除</h3>
+    <p>そうじ当番の心得 ――</p>
+    <p style="font-size:14.5px;">一、つくえを ならべる<br>二、こくばんを けす<br>三、でんきを けして かえる</p>
+    <div class="kokuban">
+      <div class="desks">
+        <span class="d g3"></span><span class="d"></span><span class="d g1"></span><span class="d"></span>
+        <span class="d"></span><span class="d"></span><span class="d g0"></span><span class="d"></span>
+        <span class="d g2"></span><span class="d"></span><span class="d"></span><span class="d"></span>
+        <span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span>
+        <span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span>
+      </div>
+    </div>
+    <p>戸締まりの錠は、四つの数。</p>
+    <div class="ansrow">
+      <input id="a-souji" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('souji')">
+      <button onclick="submitAns('souji')">提出</button>
+    </div>
+    <div class="verdict" id="v-souji"></div>
+    <div class="hintline" id="h-souji">※ どうしても詰まったら、出題者に問え。</div>
+  </div>
+</div>
+
+<!-- ================= 帰りの会: 日誌 ================= -->
+<div class="view" id="view-kaeri">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet" id="sheet-kaeri">
+    <div class="stamp">合格</div>
+    <h2>帰りの会</h2><h3>日誌</h3>
+    <p>よく学んだ。今日の答えを、すべてこの欄に(カナで)。</p>
+    <div id="diary"></div>
+    <p style="font-size:14.5px;">日直の書き置き ――<br>
+    「けふ、いちども よばれざりし おとたち あり。<br>
+    さがせども みつからず。そろへて よびて、かへるべし。」</p>
+    <div class="ansrow">
+      <input id="a-kaeri" type="text" autocomplete="off" placeholder="解答"
+        onkeydown="if(event.key==='Enter')submitAns('kaeri')">
+      <button onclick="submitAns('kaeri')">提出</button>
+    </div>
+    <div class="verdict" id="v-kaeri"></div>
+    <div class="hintline" id="h-kaeri">※ どうしても詰まったら、出題者に問え。</div>
+  </div>
+</div>
+
+<!-- ================= 準備中の時限(共通テンプレ) ================= -->
+<div class="view" id="view-notyet">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet">
+    <h2 id="ny-period"></h2><h3 id="ny-title"></h3>
+    <p class="notyet">―― この時限の問題用紙は、まだ配られていない。</p>
+  </div>
+</div>
+
+<!-- ================= 帰りの会(施錠中の表示) ================= -->
+<div class="view" id="view-kaeri-locked">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="locked-note">
+    帰りの会は、本日の全課程を修了した者のみ出席できる。<br>
+    <span id="kaeri-count"></span>
+  </div>
+</div>
+
+<!-- ================= 第一幕 修了 ================= -->
+<div class="view" id="view-clear1">
+  <div class="backbar"><span class="backbtn" onclick="goHub()">← 時間割へ</span></div>
+  <div class="sheet passed">
+    <div class="stamp" style="display:block">修了</div>
+    <h2>一日目</h2><h3>下校</h3>
+    <p>見事である。だが考査は始まったばかり。<br>
+    これまでの答えは<em style="color:var(--accent)">すべて控えておけ</em>。後に問われる。</p>
+    <p class="notyet">二日目 ―― 開講準備中。追って通知する。</p>
+  </div>
+</div>
 
 <footer>SAISHU KOSA / 出題者より</footer>
 </div>
 
 <script>
+/*PURE-START*/
 /* ---------- SHA-256 (同期・依存なし) ---------- */
 function sha256(ascii){
   function rr(v,a){return (v>>>a)|(v<<(32-a));}
@@ -271,7 +424,7 @@ function sha256(ascii){
   while(ascii.length%64-56) ascii+='\x00';
   for(i=0;i<ascii.length;i++){
     j=ascii.charCodeAt(i);
-    if(j>>8) return; // ASCII外は事前にUTF-8化すること
+    if(j>>8) return;
     words[i>>2]|=j<<((3-i)%4)*8;
   }
   words[words.length]=(asciiBitLength/mc)|0;
@@ -312,71 +465,161 @@ function utf8(s){
   return out;
 }
 function digest(s){ return sha256(utf8(s)); }
-
 /* ---------- 正規化: NFKC → 空白除去 → 小文字 → ひらがな→カタカナ ---------- */
 function norm(s){
   s=(s||'').normalize('NFKC').toLowerCase().replace(/[\s\u3000]/g,'');
   s=s.replace(/[\u3041-\u3096]/g,function(c){return String.fromCharCode(c.charCodeAt(0)+0x60);});
   return s;
 }
-
-/* ---------- 正解ハッシュ (答えの平文はソースに置かない) ---------- */
+/* ---------- 問題定義 ---------- */
+var PROBLEMS=[
+  {id:'chorei', period:'朝礼',   name:'点呼', ready:true},
+  {id:'k1',     period:'一限',   name:'国語', ready:true},
+  {id:'k2',     period:'二限',   name:'理科', ready:true},
+  {id:'k3',     period:'三限',   name:'英語', ready:true},
+  {id:'k4',     period:'四限',   name:'音楽', ready:true},
+  {id:'hiru',   period:'昼休み', name:'購買', ready:true},
+  {id:'k5',     period:'五限',   name:'社会', ready:true},
+  {id:'k6',     period:'六限',   name:'体育', ready:true},
+  {id:'souji',  period:'放課後', name:'掃除', ready:true},
+  {id:'kaeri',  period:'帰りの会', name:'日誌', ready:true, boss:true}
+];
 var GATES={
-  1:["4a38b96084a646c16bdebc0386ae2271364921d98106a3aa5409078099bc712f","eee567d54ef62d398d19e9291bcaddd37f0744206fa4dbdfc226f5df1937592d"],
-  2:["cea3bd05d426fa96697738c51871495d1a1e740170f2c1a5cb50ae3fb232f57d"],
-  3:["4167c0e28edaa1166e45701c3b937a994bf7201a8ba0342d5c7882b372fb839a","cf191c65f8fa7907ddea1088f24f3db73af0b4601a46053792bc46c9aa3f3886","6f05852707cfb7a6231deba8fc87f6ffdc683aa98627ccc7090b5ca7d6f090ca"]
+  chorei:["7dc35df5627f64b88c2c24615f28782fba68abaac403b22592e2510c29761c40",
+          "0c5566ab6861b53d73515b5a9f72b23fa432a78d70e24584a1b26b9644d1e36a"],
+  k1:["6fc78053b7090c32860487cce9731ce6c79d9a3d658f4e8e762cbb3a7038fb2d",
+      "6c0efcd48c333ac3e46426cfd5a61d8970449dc6a06568960be7b7bd069efb01"],
+  k2:["c28804408f3097f31be9af35d07aef0689ab3caeca9af148ce8fb7ea958445d9",
+      "bf728630db0bf67cd361183d90aa3aba0cbb793961244f2127fe3054a5e2cede"],
+  k3:["3366645622a780903cf8cd1c9eb8394456502f6808ef6b411f162a3187d7ff45",
+      "47f22f460052352d4d2034558b78ccd6caa88368798f338adeff2f572bbf69e0",
+      "45e0bbb7bca5629190031350491772cabc46e170f4be8401ed75d2cdcd05359c",
+      "9c5acf27530674a30353262c203de7d9699717ee123c589523f5f55ba12c7a83",
+      "018fa96a44715c90bf93be148069cb28dd45d398f2cc75aa1565311f6e55d174",
+      "354650ea8528c47a3a407721f235174c9ab4bc4a1a2439cccd7e9f4621fb5c37"],
+  k4:["09c2c079e47bfd6ffb23ce664244a25c22c4145a0d399c420c2d8814fc6cdca3",
+      "d5e4a7086fe50cd1e1b9d5b15eddd8492b663e91da29f30b5ef4555e7c15109f",
+      "6bd48039e00ac22084137a07c0e84007aefd6a3ec2bb675fbd45a3f96901fa47"],
+  hiru:["6dc2b68a39c74959e7140a653e5a7b20dbf2c73acc16bc5a41036f5d74d6e05c",
+      "a89d4f042dc5661b111b396c55ae479824c13ca6f0a1f9b201b2f5437aaab55e",
+      "d4f32384506c8c97561d64b92bcbd269762b68fdf6eca52cd34148582391d6c8"],
+  k5:["740c4e515a75869e1f7987c35cea2594fb2bb7d2c06f840be89424b2c985f151",
+      "a1a97797a0e1bac2da3a687b84b85541a11b72717205b8553eda71e727808518",
+      "827d018e1bf8a869745db69188429182e225481f53c6269b13c3f6a4c8338da7"],
+  k6:["6cca0551a34ca4533782bfbc5badc63b13463cdee302496eaee07fff762a7a09",
+      "90bbf6c274a97ea9c855ad9f54cb23612480a081bfdf61c224a851c5d925f3e0"],
+  souji:["e25f201f9014599e00073db598a2603a9c05766965336d9b9c68c3d4081ee9a3"],
+  kaeri:["64d548d60c46952f8116b5d42d796f56e1ca7951db5c7b59ff4495ac1a4868bb"]
 };
-var NEXT={1:"s2",2:"s3",3:"clear1"};
-var misses={1:0,2:0,3:0};
+/*PURE-END*/
 
-function submitAns(n){
-  var inp=document.getElementById('a'+n);
-  var box=document.getElementById('t'+n);
-  var ver=document.getElementById('v'+n);
+var misses={};
+var SKEY='sk2_progress';
+
+function loadSolved(){
+  try{ return JSON.parse(localStorage.getItem(SKEY)||'[]'); }catch(e){ return []; }
+}
+function saveSolved(id){
+  try{
+    var p=loadSolved();
+    if(p.indexOf(id)<0){p.push(id); localStorage.setItem(SKEY,JSON.stringify(p));}
+  }catch(e){}
+}
+function isSolved(id){ return loadSolved().indexOf(id)>=0; }
+function regularIds(){ return PROBLEMS.filter(function(p){return !p.boss;}).map(function(p){return p.id;}); }
+function bossOpen(){
+  var s=loadSolved();
+  return regularIds().every(function(id){return s.indexOf(id)>=0;});
+}
+
+/* ---------- ハブ描画 ---------- */
+function renderHub(){
+  var tt=document.getElementById('tt'); tt.innerHTML='';
+  PROBLEMS.forEach(function(p){
+    var div=document.createElement('div');
+    div.className='slot';
+    var state='';
+    if(p.boss){
+      if(isSolved(p.id)){ state='済'; div.classList.add('done'); }
+      else if(bossOpen()){ state='解放'; }
+      else{ state='施錠'; div.classList.add('locked'); }
+    }else if(isSolved(p.id)){ state='済'; div.classList.add('done'); }
+    else if(!p.ready){ state='未配布'; div.classList.add('na'); }
+    else{ state='未'; }
+    div.innerHTML='<div class="period">'+p.period+'</div>'+
+      '<div class="name">'+p.name+'</div><div class="state">'+state+'</div>';
+    div.onclick=function(){ openProblem(p); };
+    tt.appendChild(div);
+  });
+}
+
+/* ---------- 画面遷移 ---------- */
+function show(id){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+function goHub(){ renderHub(); show('view-hub'); }
+function openProblem(p){
+  if(p.boss){
+    if(isSolved(p.id)){ show('view-clear1'); return; }
+    if(!bossOpen()){
+      var left=regularIds().filter(function(id){return !isSolved(id);}).length;
+      document.getElementById('kaeri-count').textContent='残る課程: '+left;
+      show('view-kaeri-locked'); return;
+    }
+    renderDiary();
+    if(isSolved(p.id)) document.getElementById('sheet-kaeri').classList.add('passed');
+    show('view-kaeri'); return;
+  }
+  if(!p.ready){
+    document.getElementById('ny-period').textContent=p.period;
+    document.getElementById('ny-title').textContent=p.name;
+    show('view-notyet'); return;
+  }
+  var v=document.getElementById('view-'+p.id);
+  if(isSolved(p.id)) document.getElementById('sheet-'+p.id).classList.add('passed');
+  show('view-'+p.id);
+}
+
+/* ---------- 解答判定 ---------- */
+var DIARY=[
+  ['朝礼',4],['一限',3],['二限',3],['三限',2],['四限',3],
+  ['昼',4],['五限',3],['六限',4],['放課後',4]
+];
+function renderDiary(){
+  var el=document.getElementById('diary');
+  if(!el || el.childNodes.length) return;
+  var html='';
+  DIARY.forEach(function(r){
+    html+='<div class="drow"><span class="dlabel">'+r[0]+'</span>';
+    for(var i=1;i<=r[1];i++){ html+='<span class="cell"></span>'; }
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+function submitAns(id){
+  var inp=document.getElementById('a-'+id);
+  var sheet=document.getElementById('sheet-'+id);
+  var ver=document.getElementById('v-'+id);
   var h=digest(norm(inp.value));
-  if(GATES[n].indexOf(h)>=0){
-    box.classList.remove('wrong');
-    box.classList.add('passed');
+  if(GATES[id] && GATES[id].indexOf(h)>=0){
+    sheet.classList.remove('wrong');
+    sheet.classList.add('passed');
     ver.textContent='';
-    unlock(n);
-    save(n);
+    saveSolved(id);
+    if(id==='kaeri'){ setTimeout(function(){ show('view-clear1'); }, 900); }
   }else{
-    misses[n]++;
-    box.classList.remove('wrong');
-    void box.offsetWidth; /* reflow for re-animation */
-    box.classList.add('wrong');
+    misses[id]=(misses[id]||0)+1;
+    sheet.classList.remove('wrong');
+    void sheet.offsetWidth;
+    sheet.classList.add('wrong');
     ver.textContent='不正解。再提出せよ。';
-    if(misses[n]>=5) document.getElementById('h'+n).style.display='block';
+    if(misses[id]>=5) document.getElementById('h-'+id).style.display='block';
   }
 }
-function unlock(n){
-  var el=document.getElementById(NEXT[n]);
-  el.classList.remove('hidden');
-  setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},150);
-}
-/* ---------- 進捗保存 (使えない環境では素通し) ---------- */
-function save(n){
-  try{
-    var p=JSON.parse(localStorage.getItem('sk_progress')||'[]');
-    if(p.indexOf(n)<0)p.push(n);
-    localStorage.setItem('sk_progress',JSON.stringify(p));
-  }catch(e){}
-}
-(function restore(){
-  try{
-    var p=JSON.parse(localStorage.getItem('sk_progress')||'[]');
-    p.sort().forEach(function(n){
-      document.getElementById('t'+n).classList.add('passed');
-      document.getElementById(NEXT[n]).classList.remove('hidden');
-    });
-  }catch(e){}
-})();
-/* Enterで提出 */
-[1,2,3].forEach(function(n){
-  document.getElementById('a'+n).addEventListener('keydown',function(e){
-    if(e.key==='Enter'){e.preventDefault();submitAns(n);}
-  });
-});
+
+renderHub();
 </script>
 </body>
 </html>
