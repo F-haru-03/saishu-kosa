@@ -94,7 +94,7 @@ h1{font-size:30px; letter-spacing:.4em; margin:0; text-indent:.4em;}
 .qrow{display:flex; align-items:baseline; gap:12px; padding:9px 4px;
   border-bottom:1px solid #cfc8b4; font-size:16px;}
 .qno{color:#6b6656; flex:none; width:22px;}
-.qw{letter-spacing:.08em; flex:1;}
+.qw{letter-spacing:.08em; flex:1; word-break:break-all;}
 .qa{color:#3a3428; flex:none;}
 .qmark{color:var(--accent); flex:none; width:22px; font-size:18px;}
 .score{margin:14px 8px; line-height:2.2; font-size:18px; letter-spacing:.12em;}
@@ -132,7 +132,7 @@ footer{text-align:center; color:rgba(242,239,228,.4); font-size:11px; margin-top
   <div class="sheet" id="sheet-chorei">
     <div class="stamp">合格</div>
     <h2>朝礼</h2><h3>点呼</h3>
-    <p>招謎状を手に取れ。<br>本日の補講内容を答えよ。</p>
+    <p>招謎状を手に取れ。<br>心得と座席、あわせて読むこと。<br>本日の補講内容を答えよ。</p>
     <div class="ansrow">
       <input id="a-chorei" type="text" autocomplete="off" placeholder="解答"
         onkeydown="if(event.key==='Enter')submitAns('chorei')">
@@ -151,12 +151,13 @@ footer{text-align:center; color:rgba(242,239,228,.4); font-size:11px; margin-top
     <h2>一限</h2><h3>国語</h3>
     <p>問 ―― 次の詩を読み、問いに答えよ。</p>
     <div class="poem">
-      <div class="ptitle">「夜の図書室」</div>
-      <div><ruby>星空<rt>ほりぞら</rt></ruby>を 窓辺に置いて</div>
-      <div><ruby>言葉<rt>のとば</rt></ruby>を ひとつ 拾う</div>
-      <div><ruby>泉<rt>いずま</rt></ruby>の底に 沈めて</div>
-      <div><ruby>桜<rt>さくな</rt></ruby>の 夜に 眠る</div>
+      <div class="ptitle">「余白」</div>
+      <div><ruby>星空<rt>ほりぞら</rt></ruby>を 白紙に 写しても</div>
+      <div><ruby>言葉<rt>のとば</rt></ruby>は 余白に 沈むもの</div>
+      <div><ruby>泉<rt>いずま</rt></ruby>の底は 見えねども</div>
+      <div><ruby>桜<rt>さくな</rt></ruby>は 闇にも 咲いている</div>
     </div>
+    <p style="font-size:13px; color:#6b6656; margin:22px 4px 0;">(以下余白)</p>
     <p class="ghost">ほんこあいだにひそま、もこがたしこつづきをみもる。それはらにか。</p>
     <div class="ansrow">
       <input id="a-k1" type="text" autocomplete="off" placeholder="解答"
@@ -175,6 +176,9 @@ footer{text-align:center; color:rgba(242,239,228,.4); font-size:11px; margin-top
     <div class="stamp">合格</div>
     <h2>二限</h2><h3>理科</h3>
     <p>窓の外は、まだ夜。<br>今宵、最も明るく輝いた星の名を答えよ。</p>
+    <p style="font-size:13.5px; color:#6b6656;">
+      観測の心得 ―― 暗き夜空に星を捉えるには、露光を伸ばすべし。<br>
+      肉眼で睨んでも詮なし。写真に収め、明るさを上げてあらためよ。</p>
     <img class="pimg" src="yoru_v2.png" alt="">
     <div class="ansrow">
       <input id="a-k2" type="text" autocomplete="off" placeholder="解答"
@@ -192,15 +196,25 @@ footer{text-align:center; color:rgba(242,239,228,.4); font-size:11px; margin-top
   <div class="sheet" id="sheet-k3">
     <div class="stamp">合格</div>
     <h2>三限</h2><h3>英語</h3>
-    <p>返却された小テスト。最後の一問だけ、白紙だった。</p>
+    <p>掲示 ―― 英語部 連絡網</p>
+    <p style="font-size:13.5px; color:#6b6656;">見本(部の名)</p>
     <div class="quiz">
-      <div class="qrow"><span class="qno">1.</span><span class="qw">FRIEND</span><span class="qa">フレンド</span><span class="qmark">○</span></div>
-      <div class="qrow"><span class="qno">2.</span><span class="qw">LISTEN</span><span class="qa">リスン</span><span class="qmark">○</span></div>
-      <div class="qrow"><span class="qno">3.</span><span class="qw">WRAP</span><span class="qa">ラップ</span><span class="qmark">○</span></div>
-      <div class="qrow"><span class="qno">4.</span><span class="qw">HOUSE</span><span class="qa">ハウス</span><span class="qmark">○</span></div>
-      <div class="qrow"><span class="qno">5.</span><span class="qw">GHOST</span><span class="qa">ゴースト</span><span class="qmark">○</span></div>
-      <div class="qrow"><span class="qno">6.</span><span class="qw">＿ ＿ ＿ ＿ ＿</span><span class="qa">これを訳せ</span><span class="qmark"></span></div>
+      <div class="qrow"><span class="qa">ENGLISH</span><span class="qw mono">33・66・4・555・444・7777・44</span></div>
+      <div class="qrow"><span class="qa">CLUB</span><span class="qw mono">222・555・88・22</span></div>
     </div>
+    <p style="font-size:13.5px; color:#6b6656;">連絡先</p>
+    <div class="quiz">
+      <div class="qrow"><span class="qa">部長</span><span class="qw mono">2・66</span></div>
+      <div class="qrow"><span class="qa">副部長</span><span class="qw mono">666・3・3</span></div>
+      <div class="qrow"><span class="qa">書記</span><span class="qw mono">66・88・6・22・33・777</span></div>
+      <div class="qrow"><span class="qa">会計</span><span class="qw mono">6・444・66・88・7777</span></div>
+      <div class="qrow"><span class="qa">一年</span><span class="qw mono">666・66・33</span></div>
+      <div class="qrow"><span class="qa">二年</span><span class="qw mono">555・33・8・8・33・777</span></div>
+      <div class="qrow"><span class="qa">三年</span><span class="qw mono">444・7777</span></div>
+      <div class="qrow"><span class="qa">顧問</span><span class="qw mono">33・888・33・66</span></div>
+    </div>
+    <p>この番号では、どこにもつながらない。<br>
+    見本にならって順に読み解き、そこに書かれた問いに答えよ。</p>
     <div class="ansrow">
       <input id="a-k3" type="text" autocomplete="off" placeholder="解答"
         onkeydown="if(event.key==='Enter')submitAns('k3')">
@@ -491,12 +505,10 @@ var GATES={
       "6c0efcd48c333ac3e46426cfd5a61d8970449dc6a06568960be7b7bd069efb01"],
   k2:["c28804408f3097f31be9af35d07aef0689ab3caeca9af148ce8fb7ea958445d9",
       "bf728630db0bf67cd361183d90aa3aba0cbb793961244f2127fe3054a5e2cede"],
-  k3:["3366645622a780903cf8cd1c9eb8394456502f6808ef6b411f162a3187d7ff45",
-      "47f22f460052352d4d2034558b78ccd6caa88368798f338adeff2f572bbf69e0",
-      "45e0bbb7bca5629190031350491772cabc46e170f4be8401ed75d2cdcd05359c",
-      "9c5acf27530674a30353262c203de7d9699717ee123c589523f5f55ba12c7a83",
-      "018fa96a44715c90bf93be148069cb28dd45d398f2cc75aa1565311f6e55d174",
-      "354650ea8528c47a3a407721f235174c9ab4bc4a1a2439cccd7e9f4621fb5c37"],
+  k3:["f9f12f6ddf856084ed4217394ca11645aab90bef332891b46d7659fd1360cb13",
+      "3ba8d02b16fd2a01c1a8ba1a1f036d7ce386ed953696fa57331c2ac48a80b255",
+      "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+      "1b0542878c67f6cdf30e23c175cdcfc8c341b835e66bbf1596a823812397b2a3"],
   k4:["09c2c079e47bfd6ffb23ce664244a25c22c4145a0d399c420c2d8814fc6cdca3",
       "d5e4a7086fe50cd1e1b9d5b15eddd8492b663e91da29f30b5ef4555e7c15109f",
       "6bd48039e00ac22084137a07c0e84007aefd6a3ec2bb675fbd45a3f96901fa47"],
@@ -584,7 +596,7 @@ function openProblem(p){
 
 /* ---------- 解答判定 ---------- */
 var DIARY=[
-  ['朝礼',4],['一限',3],['二限',3],['三限',2],['四限',3],
+  ['朝礼',4],['一限',3],['二限',3],['三限',3],['四限',3],
   ['昼',4],['五限',3],['六限',4],['放課後',4]
 ];
 function renderDiary(){
